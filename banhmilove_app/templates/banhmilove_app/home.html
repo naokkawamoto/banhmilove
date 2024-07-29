@@ -1,0 +1,145 @@
+{% extends 'banhmilove_app/base.html' %}
+
+{% block content %}
+
+
+<h1>LOVE<img src="static/images/Banhmiicon.jpg" alt="Banh Mi Icon" class="banhmi-icon">バインミー</h1>
+<div class="search-area">
+    <form id="location-search" class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="近くのバインミーを探してみる" aria-label="Search for nearby Banh Mi">
+        <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search-heart"></i>検索</button>
+    </form>
+</div>
+
+<div id="map" style="height: 400px;"></div> 
+<!-- Set a height for your map container -->
+
+<script>
+    function initMap() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 15
+        });
+    
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                map.setCenter(pos);
+                searchNearbyBanhMi(map, pos);
+            }, function() {
+                handleLocationError(true, map);
+            });
+        } else {
+            handleLocationError(false, map);
+        }
+    
+        var input = document.getElementById('location-search').getElementsByTagName('input')[0];
+        var searchBox = new google.maps.places.SearchBox(input);
+    
+        map.addListener('bounds_changed', function() {
+            searchBox.setBounds(map.getBounds());
+        });
+    
+        searchBox.addListener('places_changed', function() {
+            var places = searchBox.getPlaces();
+            if (places.length === 0) return;
+    
+            map.setCenter(places[0].geometry.location);
+            searchNearbyBanhMi(map, places[0].geometry.location);
+        });
+    }
+    
+    function searchNearbyBanhMi(map, location) {
+        var service = new google.maps.places.PlacesService(map);
+        service.nearbySearch({
+            location: location,
+            radius: 5000,
+            type: ['restaurant'],
+            keyword: 'Banh Mi'
+        }, function(results, status) {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                clearMarkers();
+                results.forEach(function(place) {
+                    createMarker(place, map);
+                });
+            }
+        });
+    }
+    
+    function createMarker(place, map) {
+        var icon = {
+            url: 'static/images/Banhmiicon.jpg', // アイコンのURL
+            scaledSize: new google.maps.Size(32, 32), // アイコンのサイズを設定
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(16, 16)
+        };
+    
+        var marker = new google.maps.Marker({
+            position: place.geometry.location,
+            map: map,
+            icon: icon, // アイコンとして設定
+            title: place.name
+        });
+    
+        var infowindow = new google.maps.InfoWindow({
+            content: '<div style="font-size: 16px;"><strong>' + place.name + '</strong><br>Rating: ' + (place.rating || "Not available") + '</div>'
+        });
+    
+        marker.addListener('click', function() {
+            infowindow.open(map, marker);
+        });
+        // デフォルトでインフォウィンドウを開く
+        infowindow.open(map, marker);
+    }
+    
+    function handleLocationError(browserHasGeolocation, map) {
+        var defaultPos = {lat: 35.662889, lng: 139.665778};
+        map.setCenter(defaultPos);
+        alert(browserHasGeolocation ?
+            'Error: The Geolocation service failed.' :
+            'Error: Your browser doesn\'t support geolocation.');
+    }
+    
+    function clearMarkers() {
+        // Function to clear markers from the map
+    }
+    </script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCtMh23SsZG24HZ1pxoV3vyBMIA9g_2fMY&libraries=places&callback=initMap">
+</script>
+<hr>
+<h3><i class="bi bi-trophy"></i>ランキング</h3>
+<ul class="list-group">
+    {% for store in top_ranking_stores %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ forloop.counter }}. {{ store.store.name }}
+            <span class="badge badge-primary badge-pill">{{ store.weighted_score }}</span>
+        </li>
+    {% endfor %}
+</ul>
+<div class="text-end mt-3">
+    <a href="{% url 'rank' %}" class="btn btn-light">もっとみる</a>
+</div>
+<!-- 
+<hr>
+<h3>NEW OPEN</h3> -->
+<hr>
+<h3>#バインミー</h3>
+<div class="youtube-videos d-flex">
+    {% for video in videos %}
+        <div class="video me-3">
+            <a href="https://www.youtube.com/watch?v={{ video.video_id }}" target="_blank">
+                <img src="{{ video.thumbnail }}" alt="{{ video.title }}" class="img-thumbnail">
+            </a>
+            <p>{{ video.title|slice:":30" }}...</p>
+        </div>
+    {% endfor %}
+</div>
+<div class="mt-3 text-end">
+    <a href="{% url 'news' %}" class="btn btn-light">もっとみる</a>
+</div>
+<hr>
+
+{% endblock %}

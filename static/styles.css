@@ -1,0 +1,77 @@
+.navbar-small-text {
+    font-size: 10px;  /* 小さな文字サイズ */
+    color: #6c757d;  /* Bootstrapのtext-muted色 */
+    text-align: center; /* テキストを中央揃えにする */
+}
+
+body {
+    font-family: 'Zen Kurenaido', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+#map {
+    height: 400px;
+    width: 100%;
+}
+
+body {
+    padding-top: 50px; /* Adjust this value based on your navbar's actual height */
+}
+
+.banhmi-icon {
+    display: inline-block; /* インラインブロック要素として表示 */
+    vertical-align: middle; /* テキストの中心に合わせる */
+    margin-right: 5px; /* 右にマージンを追加してテキストから少し離す */
+    margin-bottom: 10px;
+    margin-left: 5px; 
+    width: 36px;
+    height: 36px;
+}
+
+footer {
+    padding: 20px 0;
+    font-size: 0.8rem; /* テキストのサイズを小さく設定 */
+}
+
+footer .nav-link {
+    color: #f8f9fa; /* リンクの色を白に設定 */
+}
+
+footer .nav-link:hover {
+    color: #cbd3da; /* リンクのホバー時の色を明るい灰色に設定 */
+}
+
+
+.ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.ranking-table th, .ranking-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+.ranking-table th {
+    background-color: #f2f2f2;
+    color: black;
+}
+
+.ranking-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.ranking-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+.ranking-table td.index {
+    background-color: #e0f7fa; /* インデックス列の背景色を変更 */
+}
+
+.ranking-table tr {
+    border-bottom: 1px solid #eee; /* 罫線を薄くする */
+}

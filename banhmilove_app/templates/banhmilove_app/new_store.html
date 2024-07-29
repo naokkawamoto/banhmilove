@@ -1,0 +1,34 @@
+{% extends 'banhmilove_app/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>今月オープンしたバインミー店</h1>
+
+    {% if new_stores %}
+    <table class="table table-bordered ranking-table">
+        <thead class="thead-light">
+            <tr>
+                <th>店名</th>
+                <th>所在地</th>
+                <th>登録月</th>
+                <th>google<br>レーティング</th>
+                <th>google<br>レビュー数</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for store in new_stores %}
+            <tr>
+                <td>{{ store.name }}</td>
+                <td>{{ store.prefecture }}</td>
+                <td>{{ store.registered_date }}</td>
+                <td>{{ store.rating }}</td>
+                <td>{{ store.review_count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>今月オープンしたバインミー店はありません。</p>
+    {% endif %}
+</div>
+{% endblock %}

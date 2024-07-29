@@ -1,0 +1,70 @@
+{% extends 'banhmilove_app/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>店舗分析</h1>
+    <ul class="nav nav-tabs" id="analysisTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" id="heatmap-tab" data-bs-toggle="tab" href="#heatmap" role="tab" aria-controls="heatmap" aria-selected="true">ヒートマップ</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="linechart-tab" data-bs-toggle="tab" href="#linechart" role="tab" aria-controls="linechart" aria-selected="false">店舗数推移</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="analysisTabsContent">
+        <div class="tab-pane fade show active" id="heatmap" role="tabpanel" aria-labelledby="heatmap-tab">
+            <div id="heatmapChart" style="width: 100%; height: 500px;"></div>
+        </div>
+        <div class="tab-pane fade" id="linechart" role="tabpanel" aria-labelledby="linechart-tab">
+            <div id="linechartChart" style="width: 100%; height: 500px;"></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    function loadGoogleMapsApi() {
+        var script = document.createElement('script');
+        script.src = 'https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&libraries=places&callback=initMap';
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+    }
+
+    function initMap() {
+        google.charts.load('current', {
+            'packages': ['geochart', 'corechart']
+        });
+        google.charts.setOnLoadCallback(drawCharts);
+    }
+
+    function drawCharts() {
+        console.log("Drawing charts...");
+
+        // ヒートマップ
+        var heatmapData = google.visualization.arrayToDataTable({{ heatmap_data|safe }});
+        console.log("Heatmap data:", heatmapData.toJSON());
+        var heatmapOptions = {
+            region: 'JP',
+            displayMode: 'regions',
+            resolution: 'provinces'
+        };
+        var heatmapChart = new google.visualization.GeoChart(document.getElementById('heatmapChart'));
+        heatmapChart.draw(heatmapData, heatmapOptions);
+
+        // ラインチャート
+        var linechartData = google.visualization.arrayToDataTable({{ graph_data|safe }});
+        console.log("Linechart data:", linechartData.toJSON());
+        var linechartOptions = {
+            title: '毎月の店舗数の増加',
+            curveType: 'function',
+            legend: { position: 'bottom' }
+        };
+        var linechart = new google.visualization.LineChart(document.getElementById('linechartChart'));
+        linechart.draw(linechartData, linechartOptions);
+    }
+
+    // Google Maps APIを非同期にロード
+    loadGoogleMapsApi();
+</script>
+{% endblock %}

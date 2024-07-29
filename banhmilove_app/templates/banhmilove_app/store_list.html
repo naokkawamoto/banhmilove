@@ -1,0 +1,93 @@
+{% extends 'banhmilove_app/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Store List</h1>
+
+    <!-- 検索フォーム -->
+    <form method="get" action="{% url 'store_list' %}" class="form-inline mb-3">
+        <div class="form-group mr-2">
+            <label for="name" class="mr-2">店舗名:</label>
+            <input type="text" name="name" id="name" value="{{ name_query }}" class="form-control" placeholder="店舗名を入力">
+        </div>
+        <div class="form-group mr-2">
+            <label for="prefecture">都道府県:</label>
+            <select name="prefecture" id="prefecture" class="form-control">
+                <option value="">All</option>
+                {% for pref in prefectures %}
+                <option value="{{ pref }}" {% if pref == prefecture %}selected{% endif %}>{{ pref }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Search</button>
+    </form>
+
+    <table class="ranking-table mt-3">
+        <thead>
+            <tr>
+                <th>店名</th>
+                <th>都道府県</th>
+                <th>市区町村</th>
+                <th>google<br>レーティング</th>
+                <th>google<br>レビュー数</th>
+                <th>Website</th>
+                <th>登録月</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for store in page_obj %}
+            <tr>
+                <td>{{ store.name }}</td>
+                <td>{{ store.prefecture }}</td>
+                <td>{{ store.city }}</td>
+                <td>{{ store.rating }}</td>
+                <td>{{ store.review_count }}</td>
+                <td><a href="{{ store.url }}" target="_blank">Visit Website</a></td>
+                <td>{{ store.registered_date|date:"Y年m月" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">No stores found.</td>
+            </tr>
+            {% endfor %}
+            <!-- 閉鎖した店舗 -->
+            {% for store in closed_stores %}
+            <tr>
+                <td>{{ store.name }}</td>
+                <td>{{ store.prefecture }}</td>
+                <td>{{ store.city }}</td>
+                <td>閉鎖</td>
+                <td>閉鎖</td>
+                <td>閉鎖</td>
+                <td>{{ store.registered_date|date:"Y年m月" }} (閉鎖)</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- ページネーション -->
+    <nav aria-label="Page navigation example" class="mt-4">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if prefecture %}&prefecture={{ prefecture }}{% endif %}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link" href="?page={{ num }}{% if prefecture %}&prefecture={{ prefecture }}{% endif %}">{{ num }}</a>
+            </li>
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if prefecture %}&prefecture={{ prefecture }}{% endif %}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endblock %}

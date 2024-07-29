@@ -1,0 +1,48 @@
+{% extends 'banhmilove_app/base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ year }}年{{ month }}月バインミー店ランキング</h1>
+    <p>※スコアはレーティングとレビュー数から算出</p>
+
+    <!-- 月ごとのタブ -->
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        {% for m in months %}
+        <li class="nav-item">
+            <a class="nav-link {% if m == month %}active{% endif %}" href="?year={{ year }}&month={{ m }}">{{ m }}月</a>
+        </li>
+        {% endfor %}
+    </ul>
+
+    {% if data_exists %}
+    <table class="table table-bordered ranking-table">
+        <thead class="thead-light">
+            <tr>
+                <th>順位</th>
+                <th>店名</th>
+                <th>所在地</th>
+                <th>スコア※</th>
+                <th>google<br>レーティング</th>
+                <th>google<br>レビュー数</th>
+                <th>登録月</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in stores %}
+            <tr>
+                <td class="index">{{ data.ranking }}</td>
+                <td>{{ data.store.name }}</td>
+                <td>{{ data.store.prefecture }}</td>
+                <td>{{ data.weighted_score|floatformat:2 }}</td>
+                <td>{{ data.store.rating }}</td>
+                <td>{{ data.store.review_count }}</td>
+                <td>{{ data.store.registered_month }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>この月のデータは存在しません。</p>
+    {% endif %}
+</div>
+{% endblock %}
