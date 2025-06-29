@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ store.name }}</h1>
+    <p><strong>都道府県:</strong> {{ store.prefecture }}</p>
+    <p><strong>市区町村:</strong> {{ store.city }}</p>
+    <p><strong>緯度:</strong> {{ store.latitude }}</p>
+    <p><strong>経度:</strong> {{ store.longitude }}</p>
+    <p><strong>Google Place ID:</strong> {{ store.place_id }}</p>
+    <p><strong>Website:</strong> <a href="{{ store.url }}" target="_blank">{{ store.url }}</a></p>
+
+    <h2>Monthly Data</h2>
+    <ul>
+        {% for data in monthly_data %}
+        <li>{{ data.date }} - Rating: {{ data.rating }}, Reviews: {{ data.review_count }}, Weighted Score: {{ data.weighted_score }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
