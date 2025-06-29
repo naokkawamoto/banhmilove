@@ -1,2 +1,7 @@
 venv/
 __pycache__/
+venv/
+db.sqlite3
+debug.log
+fetched_places.csv
+fetched_places_with_category_and_description.csv
