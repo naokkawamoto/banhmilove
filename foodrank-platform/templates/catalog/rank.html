@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}全国バインミーランキング{% endblock %}
+{% block meta_description %}全国のバインミー店舗を評価・レビュー数ベースで比較できるランキングページ。{% endblock %}
+{% block content %}
+  <h1>全国バインミーランキング</h1>
+  <p class="muted">カテゴリ「バインミー」の上位を表示しています。</p>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>店舗名</th>
+        <th>地域</th>
+        <th>評価</th>
+        <th>レビュー数</th>
+        <th>スコア</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in rows %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ item.venue.name }}</td>
+        <td>{{ item.region.name }}</td>
+        <td>{{ item.venue.rating }}</td>
+        <td>{{ item.venue.review_count }}</td>
+        <td>{{ item.weighted_score|floatformat:2 }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6">データがありません。</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

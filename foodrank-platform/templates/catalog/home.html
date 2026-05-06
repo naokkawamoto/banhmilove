@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}LOVEバインミー{% endblock %}
+{% block meta_description %}バインミーを中心に、地域別ランキングと最新動画をまとめて探せるLOVEバインミーのホーム。{% endblock %}
+{% block content %}
+  <h1>LOVE バインミー</h1>
+  <p class="muted">旧サイト構成に合わせたホームです。地図・ランキング・動画を1ページで確認できます。</p>
+
+  <section class="card" style="margin-bottom:14px;">
+    <h2>近くのバインミーを探す</h2>
+    <div class="toolbar">
+      <input id="location-input" class="input" type="text" placeholder="エリア名を入力（例: 下北沢）">
+      <button id="search-btn" class="btn" type="button">検索</button>
+    </div>
+    <div id="map" style="height: 360px; border:1px solid #e5e7eb; border-radius:8px;"></div>
+    <p class="muted" style="margin-top:8px;">※ 表示は Google Maps / Places の結果に依存します。</p>
+  </section>
+
+  <section class="card" style="margin-bottom:14px;">
+    <h2><a href="/rank/">ランキング</a></h2>
+    <table>
+      <thead>
+        <tr><th>#</th><th>店舗名</th><th>スコア</th></tr>
+      </thead>
+      <tbody>
+        {% for row in top_rows %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ row.venue.name }}</td>
+            <td>{{ row.weighted_score|floatformat:2 }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="3">データがありません。</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p style="margin-top:10px;"><a href="/rank/">もっとみる</a></p>
+  </section>
+
+  <section class="card" style="margin-bottom:14px;">
+    <h2>#バインミー（YouTube）</h2>
+    {% if news_error %}
+      <p class="muted">{{ news_error }}</p>
+    {% endif %}
+    <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+      {% for video in videos %}
+        <article class="card">
+          <div style="position:relative; width:100%; padding-top:56.25%; border-radius:8px; overflow:hidden; background:#000;">
+            <iframe
+              src="https://www.youtube.com/embed/{{ video.video_id }}"
+              title="{{ video.title }}"
+              style="position:absolute; inset:0; width:100%; height:100%; border:0;"
+              loading="lazy"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen>
+            </iframe>
+          </div>
+          <p style="margin:8px 0 4px;">{{ video.title|truncatechars:60 }}</p>
+          <a href="https://www.youtube.com/watch?v={{ video.video_id }}" target="_blank" rel="noopener noreferrer">動画を見る</a>
+        </article>
+      {% empty %}
+        <p class="muted">動画がありません。</p>
+      {% endfor %}
+    </div>
+    <p style="margin-top:10px;"><a href="/news/">もっとみる</a></p>
+  </section>
+
+  <section class="card">
+    <h2>地域 x ジャンル一覧</h2>
+    <div class="grid">
+      {% for region in regions %}
+        <section class="card">
+          <h3 style="margin:0 0 6px;">{{ region.name }}</h3>
+          <p class="muted"><span class="pill">{{ region.level }}</span></p>
+          <ul>
+            {% for category in categories %}
+              <li><a href="/ranking/{{ region.code }}/{{ category.code }}/">{{ category.name }} ランキング</a></li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if google_maps_api_key %}
+  <script>
+    let map;
+    let markers = [];
+
+    function initMap() {
+      const defaultPos = { lat: 35.6617, lng: 139.6686 };
+      map = new google.maps.Map(document.getElementById("map"), {
+        center: defaultPos,
+        zoom: 14,
+      });
+      const input = document.getElementById("location-input");
+      const btn = document.getElementById("search-btn");
+      const searchBox = new google.maps.places.SearchBox(input);
+
+      const runSearch = () => {
+        const places = searchBox.getPlaces();
+        if (!places || places.length === 0) return;
+        const target = places[0].geometry.location;
+        map.setCenter(target);
+        searchNearby(target);
+      };
+
+      searchBox.addListener("places_changed", runSearch);
+      btn.addEventListener("click", () => {
+        const service = new google.maps.places.PlacesService(map);
+        service.textSearch({ query: `${input.value} バインミー` }, (results, status) => {
+          if (status !== google.maps.places.PlacesServiceStatus.OK || !results.length) return;
+          map.setCenter(results[0].geometry.location);
+          searchNearby(results[0].geometry.location);
+        });
+      });
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          const pos = { lat: position.coords.latitude, lng: position.coords.longitude };
+          map.setCenter(pos);
+          searchNearby(pos);
+        });
+      }
+    }
+
+    function clearMarkers() {
+      markers.forEach((m) => m.setMap(null));
+      markers = [];
+    }
+
+    function searchNearby(location) {
+      const service = new google.maps.places.PlacesService(map);
+      service.nearbySearch(
+        { location, radius: 5000, type: ["restaurant"], keyword: "バインミー" },
+        (results, status) => {
+          if (status !== google.maps.places.PlacesServiceStatus.OK) return;
+          clearMarkers();
+          results.forEach((place) => {
+            const marker = new google.maps.Marker({ map, position: place.geometry.location, title: place.name });
+            markers.push(marker);
+          });
+        }
+      );
+    }
+  </script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&callback=initMap"></script>
+  {% endif %}
+{% endblock %}

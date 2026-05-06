@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}ブログ一覧{% endblock %}
+{% block meta_description %}バインミー関連のブログ記事一覧。地域情報や食べ方、ニュースまとめを掲載。{% endblock %}
+{% block content %}
+  <h1>ブログ</h1>
+  <div class="toolbar">
+    <a href="/blog/?lang=ja">日本語</a> | <a href="/blog/?lang=en">English</a>
+  </div>
+  <p class="muted">公開記事 {{ posts|length }} 件</p>
+
+  {% for post in posts %}
+    <article class="card" style="margin-bottom:10px;">
+      <h2><a href="/blog/{{ post.slug }}/?lang={{ lang }}">{{ post.title }}</a></h2>
+      <div class="muted">{{ post.published_at }}</div>
+      {% if post.meta_description %}
+        <p class="muted">{{ post.meta_description }}</p>
+      {% endif %}
+    </article>
+  {% empty %}
+    <p>公開記事はまだありません。</p>
+  {% endfor %}
+{% endblock %}

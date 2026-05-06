@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ region.name }} {{ category.name }} ランキング{% endblock %}
+{% block meta_description %}{{ region.name }}の{{ category.name }}ランキング。評価とレビュー数をもとに上位店舗を表示。{% endblock %}
+{% block content %}
+  <h1>{{ region.name }} × {{ category.name }} ランキング</h1>
+  <p class="muted">上位 {{ listings|length }} 件を表示中</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>店舗名</th>
+        <th>評価</th>
+        <th>レビュー数</th>
+        <th>スコア</th>
+        <th>Google Maps</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in listings %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ item.venue.name }}</td>
+        <td>{{ item.venue.rating }}</td>
+        <td>{{ item.venue.review_count }}</td>
+        <td class="score">{{ item.weighted_score|floatformat:2 }}</td>
+        <td>
+          {% if item.venue.google_maps_url %}
+            <a href="{{ item.venue.google_maps_url }}" target="_blank" rel="noopener noreferrer">地図を見る</a>
+          {% else %}
+            -
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

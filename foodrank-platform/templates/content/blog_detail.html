@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block meta_description %}{{ post.meta_description|default:post.title }}{% endblock %}
+{% block content %}
+  <p><a href="/blog/?lang={{ lang }}">← ブログ一覧へ戻る</a></p>
+  <article class="card">
+    <h1>{{ post.title }}</h1>
+    <div class="muted">{{ post.published_at }}</div>
+    <div style="white-space: pre-wrap; margin-top:14px;">{{ post.body }}</div>
+  </article>
+{% endblock %}

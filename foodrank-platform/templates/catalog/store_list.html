@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}全国バインミー店リスト{% endblock %}
+{% block meta_description %}全国のバインミー店を一覧で検索できるページ。店名検索と評価情報を掲載。{% endblock %}
+{% block content %}
+  <h1>全国バインミー店リスト</h1>
+  <form method="get" class="toolbar">
+    <input class="input" type="text" name="name" value="{{ name_query }}" placeholder="店名で検索">
+    <button class="btn" type="submit">検索</button>
+  </form>
+  <p class="muted">表示件数: {{ page_obj.paginator.count }}件</p>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>店舗名</th>
+        <th>評価</th>
+        <th>レビュー数</th>
+        <th>住所</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for venue in page_obj %}
+      <tr>
+        <td>{{ forloop.counter0|add:page_obj.start_index }}</td>
+        <td>
+          {% if venue.google_maps_url %}
+            <a href="{{ venue.google_maps_url }}" target="_blank" rel="noopener noreferrer">{{ venue.name }}</a>
+          {% else %}
+            {{ venue.name }}
+          {% endif %}
+        </td>
+        <td>{{ venue.rating }}</td>
+        <td>{{ venue.review_count }}</td>
+        <td>{{ venue.address }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5">該当店舗がありません。</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="toolbar" style="margin-top:12px;">
+    {% if page_obj.has_previous %}
+      <a href="?name={{ name_query|urlencode }}&page={{ page_obj.previous_page_number }}">← 前へ</a>
+    {% endif %}
+    <span class="muted">Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+      <a href="?name={{ name_query|urlencode }}&page={{ page_obj.next_page_number }}">次へ →</a>
+    {% endif %}
+  </div>
+{% endblock %}

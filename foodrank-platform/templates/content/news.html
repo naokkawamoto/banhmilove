@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}News{% endblock %}
+{% block meta_description %}バインミー関連のYouTube動画ニュースをまとめてチェックできるページ。{% endblock %}
+{% block content %}
+  <h1>News (YouTube)</h1>
+  {% if error %}
+    <p style="color:#b00020">{{ error }}</p>
+  {% endif %}
+  <div class="grid">
+    {% for video in videos %}
+      <article class="card">
+        <div style="position:relative; width:100%; padding-top:56.25%; border-radius:8px; overflow:hidden; background:#000;">
+          <iframe
+            src="https://www.youtube.com/embed/{{ video.video_id }}"
+            title="{{ video.title }}"
+            style="position:absolute; inset:0; width:100%; height:100%; border:0;"
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen>
+          </iframe>
+        </div>
+        <div>
+          <h3>{{ video.title }}</h3>
+          <p class="muted">{{ video.description|truncatechars:100 }}</p>
+          <p><a href="https://www.youtube.com/watch?v={{ video.video_id }}" target="_blank" rel="noopener noreferrer">動画を見る</a></p>
+        </div>
+      </article>
+    {% empty %}
+      <p>ニュースはまだありません。</p>
+    {% endfor %}
+  </div>
+{% endblock %}
